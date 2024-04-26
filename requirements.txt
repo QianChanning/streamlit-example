@@ -1,3 +1,12 @@
 altair
+numpy
 pandas
+pydeck
 streamlit
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+imbalanced-learn
+joblib
