@@ -8,10 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_auc_score
 from sklearn.preprocessing import LabelEncoder
-from imblearn.under_sampling import RandomUnderSampler
 
 # Load the dataset
 data = pd.read_csv('training.csv')
@@ -39,25 +36,10 @@ y = data['Churn']
 # Split dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
 
-# Initialize the RandomUnderSampler
-under_sampler = RandomUnderSampler(random_state=42)
-X_train_resampled, y_train_resampled = under_sampler.fit_resample(X_train, y_train)
-
 # Random Forest Model
-rf_model = RandomForestClassifier(n_estimators=200, random_state=42)
-rf_model.fit(X_train_resampled, y_train_resampled)
+rf_model = RandomForestClassifier(random_state=42)
+rf_model.fit(X_train, y_train)
 Y_pred_rf = rf_model.predict(X_test)
-
-# Metrics for Random Forest
-accuracy_rf = accuracy_score(y_test, Y_pred_rf)
-conf_matrix_rf = confusion_matrix(y_test, Y_pred_rf)
-class_report_rf = classification_report(y_test, Y_pred_rf)
-roc_auc_rf = roc_auc_score(y_test, rf_model.predict_proba(X_test)[:, 1])
-# Metrics for Random Forest
-print(f"Accuracy: {accuracy_rf}")
-print(f"Confusion Matrix:\n{conf_matrix_rf}")
-print(f"Classification Report:\n{class_report_rf}")
-print(f"ROC AUC Score: {roc_auc_rf}")
 
 # Get feature importances from the trained Random Forest model
 feature_importances = rf_model.feature_importances_
@@ -77,10 +59,14 @@ plt.ylabel("Mean Decrease in Accuracy")
 plt.tight_layout()
 plt.show()
 
-
-
 import joblib
 
+# After training the rf_model...
+joblib.dump(rf_model, 'rf_model.joblib')
+joblib.dump(y_test, 'y_test.joblib')
+joblib.dump(rf_model.predict_proba(X_test), 'probabilities.joblib')
+
+import joblib
 # After training the rf_model...
 joblib.dump(rf_model, 'rf_model.joblib')
 joblib.dump(y_test, 'y_test.joblib')
@@ -158,5 +144,3 @@ if st.button('Predict Churn'):
     plt.ylabel('Probability')
     plt.title('Probability of Customer Churn')
     st.pyplot(fig)
-
-
